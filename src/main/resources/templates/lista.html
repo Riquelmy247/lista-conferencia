@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Conferência</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nao-pago {
+            color: red;
+        }
+        .modal-backdrop {
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .table-responsive {
+                margin-bottom: 1rem;
+            }
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            .form-control {
+                margin-bottom: 0.5rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .entrou-confirmada {
+            background-color: #d4edda;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Lista de Mulheres Conferência</h2>
+
+    <!-- Formulário de Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <input type="text" name="nome" th:value="${filtroNome}" class="form-control" placeholder="Buscar por nome">
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <select name="pagou" class="form-select">
+                            <option value="">Status Pagamento</option>
+                            <option value="1" th:selected="${filtroPagou == 1}">Pago</option>
+                            <option value="0" th:selected="${filtroPagou == 0}">Não Pago</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <select name="entrou" class="form-select">
+                            <option value="">Status Entrada</option>
+                            <option value="1" th:selected="${filtroEntrou == 1}">Entrou</option>
+                            <option value="0" th:selected="${filtroEntrou == 0}">Pendente</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Pessoas -->
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>Nome</th>
+                <th>Pagamento</th>
+                <th>Entrou</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="pessoa : ${pessoas}" th:classappend="${pessoa.entrou == 1 ? 'entrou-confirmada' : ''}">
+                <td>
+                            <span th:text="${pessoa.nome}"
+                                  th:class="${pessoa.pagou == 0 ? 'nao-pago' : (pessoa.entrou == 1 ? 'fw-bold text-success' : '')}"
+                                  style="cursor: pointer"
+                                  th:data-id="${pessoa.id}"
+                                  onclick="confirmarEntrada(this)">
+                            </span>
+                </td>
+                <td>
+                            <span class="badge" th:classappend="${pessoa.pagou == 1 ? 'bg-success' : 'bg-danger'}"
+                                  th:text="${pessoa.pagou == 1 ? 'Pago' : 'Não Pago'}">
+                            </span>
+                </td>
+                <td>
+                            <span class="badge" th:classappend="${pessoa.entrou == 1 ? 'bg-success' : 'bg-warning'}"
+                                  th:text="${pessoa.entrou == 1 ? 'Entrou' : 'Pendente'}">
+                            </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmacaoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Entrada</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Deseja confirmar a entrada desta pessoa?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+                <button type="button" class="btn btn-primary" onclick="confirmarEntradaModal()">Sim</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let pessoaIdSelecionada;
+    const modal = new bootstrap.Modal(document.getElementById('confirmacaoModal'));
+
+    function confirmarEntrada(element) {
+        pessoaIdSelecionada = element.getAttribute('data-id');
+        modal.show();
+    }
+
+    function confirmarEntradaModal() {
+        fetch(`/confirmar-entrada/${pessoaIdSelecionada}`, {
+            method: 'POST',
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
+    }
+</script>
+</body>
+</html>
