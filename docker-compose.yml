@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  lista-conferencia:
+    image: lista-conferencia
+    pull_policy: never
+    restart: always
+    container_name: lista-conferencia
+    environment:
+      - SERVER_PORT=8080
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - APP_DOMAIN=conferencia.thiagosol.com
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lista-conferencia.entrypoints=http"
+      - "traefik.http.routers.lista-conferencia.rule=Host(`conferencia.thiagosol.com`)"
+      - "traefik.http.routers.lista-conferencia-secure.entrypoints=https"
+      - "traefik.http.routers.lista-conferencia-secure.rule=Host(`conferencia.thiagosol.com`)"
+      - "traefik.http.routers.lista-conferencia-secure.tls=true"
+      - "traefik.http.routers.lista-conferencia-secure.service=lista-conferencia-secure"
+      - "traefik.http.services.lista-conferencia-secure.loadbalancer.server.port=8080"
+      - "traefik.docker.network=external-sol-apis"
+    networks:
+      - external-sol-apis
+      - logging-network
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-external-labels: "service=lista-conferencia,type=service"
+        loki-retries: "5"
+        loki-batch-size: "400"
+        mode: "non-blocking"
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+
+networks:
+  logging-network:
+    external: true
+  external-sol-apis:
+    external: true

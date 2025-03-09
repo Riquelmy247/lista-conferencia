@@ -1,0 +1,64 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Logs ###
+*.log
+logs/
+
+### Environment Variables ###
+.env
+.env.local
+.env.*.local
+
+### Sistema Operacional ###
+.DS_Store
+Thumbs.db
+
+### Thymeleaf ###
+.thymeleaf-cache/
+
+### Maven ###
+.mvn/*
+!.mvn/wrapper/
+mvnw
+mvnw.cmd
+.flattened-pom.xml
+
+### Outros ###
+*.swp
+*.swo
+node_modules/
+dist/
+tmp/
+temp/ 
