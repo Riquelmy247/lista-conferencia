@@ -17,14 +17,14 @@ public class PessoaService {
         return pessoaRepository.findAll();
     }
 
-    public List<Pessoa> buscarPorFiltros(String nome, Integer pagou, Integer entrou) {
-        return pessoaRepository.findByFiltros(nome, pagou, entrou);
+    public List<Pessoa> buscarPorFiltros(String nome, Integer patrocinador, Integer pagou, Integer entrou) {
+        return pessoaRepository.findByFiltros(nome, patrocinador, pagou, entrou);
     }
 
     @Transactional
     public void confirmarEntrada(Long id) {
         pessoaRepository.findById(id).ifPresent(pessoa -> {
-            if (pessoa.getPagou() == 0) {
+            if(pessoa.getPagou() == 0){
                 pessoa.setPagou(1);
             }
             pessoa.setEntrou(1);

@@ -6,35 +6,33 @@
     <title>Sistema de Conferência</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .nao-pago {
-            color: red;
+        .modal-backdrop { opacity: 0.5; }
+
+        .clickable-row {
+            cursor: pointer;
         }
-        .modal-backdrop {
-            opacity: 0.5;
+        .clickable-row:hover {
+            background-color: rgba(0,0,0,0.075);
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            .table-responsive {
-                margin-bottom: 1rem;
-            }
-            .btn {
-                width: 100%;
-                margin-bottom: 0.5rem;
-            }
-            .form-control {
-                margin-bottom: 0.5rem;
-            }
-            h2 {
-                font-size: 1.5rem;
-                margin-bottom: 1rem;
-            }
+            .container { padding: 10px; }
+            .table-responsive { margin-bottom: 1rem; }
+            .btn { width: 100%; margin-bottom: 0.5rem; }
+            .form-control { margin-bottom: 0.5rem; }
+            h2 { font-size: 1.5rem; margin-bottom: 1rem; }
         }
 
         .entrou-confirmada {
             background-color: #d4edda;
+        }
+
+        .badge-cell {
+            text-align: center;
+        }
+
+        .badge {
+            min-width: 60px;
         }
     </style>
 </head>
@@ -45,27 +43,37 @@
     <!-- Formulário de Filtros -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="get">
+            <form method="get" id="filterForm">
                 <div class="row g-3">
                     <div class="col-12 col-md-4">
                         <input type="text" name="nome" th:value="${filtroNome}" class="form-control" placeholder="Buscar por nome">
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
                         <select name="pagou" class="form-select">
-                            <option value="">Status Pagamento</option>
-                            <option value="1" th:selected="${filtroPagou == 1}">Pago</option>
-                            <option value="0" th:selected="${filtroPagou == 0}">Não Pago</option>
+                            <option value="">Pago</option>
+                            <option value="1" th:selected="${filtroPagou == 1}">Sim</option>
+                            <option value="0" th:selected="${filtroPagou == 0}">Não</option>
                         </select>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-2">
+                        <select name="patrocinador" class="form-select">
+                            <option value="">Apoiador</option>
+                            <option value="1" th:selected="${filtroPatrocinador == 1}">Sim</option>
+                            <option value="0" th:selected="${filtroPatrocinador == 0}">Não</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4">
                         <select name="entrou" class="form-select">
-                            <option value="">Status Entrada</option>
-                            <option value="1" th:selected="${filtroEntrou == 1}">Entrou</option>
-                            <option value="0" th:selected="${filtroEntrou == 0}">Pendente</option>
+                            <option value="">Status</option>
+                            <option value="1" th:selected="${filtroEntrou == 1}">Presente</option>
+                            <option value="0" th:selected="${filtroEntrou == 0}">Ausente</option>
                         </select>
                     </div>
-                    <div class="col-12 col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                    <div class="col-12">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="submit" class="btn btn-primary">Buscar</button>
+                            <button type="button" class="btn btn-secondary" onclick="limparFiltros()">Limpar</button>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -74,33 +82,40 @@
 
     <!-- Lista de Pessoas -->
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table">
             <thead class="table-light">
             <tr>
                 <th>Nome</th>
-                <th>Pagamento</th>
-                <th>Entrou</th>
+                <th class="text-center">Pago</th>
+                <th class="text-center">Apoiador</th>
+                <th class="text-center">Status</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="pessoa : ${pessoas}" th:classappend="${pessoa.entrou == 1 ? 'entrou-confirmada' : ''}">
+            <tr th:each="pessoa : ${pessoas}" 
+                th:classappend="${pessoa.entrou == 1 ? 'entrou-confirmada' : ''}"
+                class="clickable-row"
+                th:data-id="${pessoa.id}"
+                onclick="confirmarEntrada(this)">
                 <td>
-                            <span th:text="${pessoa.nome}"
-                                  th:class="${pessoa.pagou == 0 ? 'nao-pago' : (pessoa.entrou == 1 ? 'fw-bold text-success' : '')}"
-                                  style="cursor: pointer"
-                                  th:data-id="${pessoa.id}"
-                                  onclick="confirmarEntrada(this)">
-                            </span>
+                    <span th:text="${pessoa.nome}"
+                          th:class="${pessoa.entrou == 1 ? 'fw-bold text-success' : ''}">
+                    </span>
                 </td>
-                <td>
-                            <span class="badge" th:classappend="${pessoa.pagou == 1 ? 'bg-success' : 'bg-danger'}"
-                                  th:text="${pessoa.pagou == 1 ? 'Pago' : 'Não Pago'}">
-                            </span>
+                <td class="badge-cell">
+                    <span class="badge" th:classappend="${pessoa.pagou == 1 ? 'bg-success' : 'bg-danger'}"
+                          th:text="${pessoa.pagou == 1 ? 'Sim' : 'Não'}">
+                    </span>
                 </td>
-                <td>
-                            <span class="badge" th:classappend="${pessoa.entrou == 1 ? 'bg-success' : 'bg-warning'}"
-                                  th:text="${pessoa.entrou == 1 ? 'Entrou' : 'Pendente'}">
-                            </span>
+                <td class="badge-cell">
+                    <span class="badge" th:classappend="${pessoa.patrocinador == 1 ? 'bg-success' : 'bg-danger'}"
+                          th:text="${pessoa.patrocinador == 1 ? 'Sim' : 'Não'}">
+                    </span>
+                </td>
+                <td class="badge-cell">
+                    <span class="badge" th:classappend="${pessoa.entrou == 1 ? 'bg-success' : 'bg-warning'}"
+                          th:text="${pessoa.entrou == 1 ? 'Presente' : 'Ausente'}">
+                    </span>
                 </td>
             </tr>
             </tbody>
@@ -142,9 +157,17 @@
             method: 'POST',
         }).then(response => {
             if (response.ok) {
-                window.location.reload();
+                window.location.href = '/';
             }
         });
+    }
+
+    function limparFiltros() {
+        document.querySelector('input[name="nome"]').value = '';
+        document.querySelector('select[name="patrocinador"]').value = '';
+        document.querySelector('select[name="pagou"]').value = '';
+        document.querySelector('select[name="entrou"]').value = '';
+        document.getElementById('filterForm').submit();
     }
 </script>
 </body>

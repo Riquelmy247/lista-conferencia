@@ -15,6 +15,9 @@ public class Pessoa {
     private String nome;
 
     @Column(nullable = false)
+    private Integer patrocinador = 0;
+
+    @Column(nullable = false)
     private Integer pagou = 0;
 
     @Column(nullable = false)

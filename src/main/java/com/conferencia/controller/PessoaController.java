@@ -17,10 +17,12 @@ public class PessoaController {
     @GetMapping
     public String listar(Model model,
                         @RequestParam(required = false) String nome,
+                        @RequestParam(required = false) Integer patrocinador,
                         @RequestParam(required = false) Integer pagou,
                         @RequestParam(required = false) Integer entrou) {
-        model.addAttribute("pessoas", pessoaService.buscarPorFiltros(nome, pagou, entrou));
+        model.addAttribute("pessoas", pessoaService.buscarPorFiltros(nome, patrocinador, pagou, entrou));
         model.addAttribute("filtroNome", nome);
+        model.addAttribute("filtroPatrocinador", patrocinador);
         model.addAttribute("filtroPagou", pagou);
         model.addAttribute("filtroEntrou", entrou);
         return "lista";
