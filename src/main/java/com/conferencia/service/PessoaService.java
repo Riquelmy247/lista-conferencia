@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PessoaService {
@@ -32,7 +33,26 @@ public class PessoaService {
         });
     }
 
+    @Transactional
     public Pessoa salvar(Pessoa pessoa) {
+        if (pessoa.getId() != null) {
+            Pessoa pessoaExistente = pessoaRepository.findById(pessoa.getId())
+                    .orElseThrow();
+            
+            if (pessoaExistente.getEntrou() == 1) {
+                pessoa.setEntrou(1);
+            }
+        }
+        
         return pessoaRepository.save(pessoa);
+    }
+
+    public Optional<Pessoa> buscarPorId(Long id) {
+        return pessoaRepository.findById(id);
+    }
+
+    @Transactional
+    public void deletar(Long id) {
+        pessoaRepository.deleteById(id);
     }
 } 

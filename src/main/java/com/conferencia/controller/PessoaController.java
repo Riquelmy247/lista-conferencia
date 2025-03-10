@@ -36,8 +36,41 @@ public class PessoaController {
     }
 
     @PostMapping("/salvar")
-    public String salvar(@ModelAttribute Pessoa pessoa) {
+    public String salvar(@ModelAttribute Pessoa pessoa, 
+                         @RequestParam(required = false, defaultValue = "false") boolean isPatrocinador,
+                         @RequestParam(required = false, defaultValue = "false") boolean isPagou) {
+        
+        pessoa.setPatrocinador(isPatrocinador ? 1 : 0);
+        pessoa.setPagou(isPagou ? 1 : 0);
+        
+        if (pessoa.getId() == null) {
+            pessoa.setEntrou(0);
+        }
+        
         pessoaService.salvar(pessoa);
         return "redirect:/";
+    }
+
+    @GetMapping("/novo")
+    public String formulario(Model model) {
+        model.addAttribute("pessoa", new Pessoa());
+        model.addAttribute("edicao", false);
+        return "formulario";
+    }
+
+    @GetMapping("/editar/{id}")
+    public String editar(@PathVariable Long id, Model model) {
+        pessoaService.buscarPorId(id).ifPresent(pessoa -> {
+            model.addAttribute("pessoa", pessoa);
+            model.addAttribute("edicao", true);
+        });
+        return "formulario";
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    @ResponseBody
+    public String deletar(@PathVariable Long id) {
+        pessoaService.deletar(id);
+        return "success";
     }
 } 
