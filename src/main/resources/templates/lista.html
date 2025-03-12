@@ -57,13 +57,6 @@
                         <input type="text" name="nome" th:value="${filtroNome}" class="form-control" placeholder="Buscar por nome">
                     </div>
                     <div class="col-6 col-md-2">
-                        <select name="pagou" class="form-select">
-                            <option value="">Pago</option>
-                            <option value="1" th:selected="${filtroPagou == 1}">Sim</option>
-                            <option value="0" th:selected="${filtroPagou == 0}">Não</option>
-                        </select>
-                    </div>
-                    <div class="col-6 col-md-2">
                         <select name="igreja" class="form-select">
                             <option value="">Igreja</option>
                             <option th:each="igreja : ${igrejas}"
@@ -71,6 +64,13 @@
                                     th:text="${igreja}"
                                     th:selected="${igreja == filtroIgreja}">
                             </option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <select name="pagou" class="form-select">
+                            <option value="">Pago</option>
+                            <option value="1" th:selected="${filtroPagou == 1}">Sim</option>
+                            <option value="0" th:selected="${filtroPagou == 0}">Não</option>
                         </select>
                     </div>
                     <div class="col-12 col-md-4">
@@ -97,8 +97,8 @@
             <thead class="table-light">
             <tr>
                 <th>Nome</th>
-                <th class="text-center">Pago</th>
                 <th class="text-center">Igreja</th>
+                <th class="text-center">Pago</th>
                 <th class="text-center">Status</th>
             </tr>
             </thead>
@@ -114,13 +114,13 @@
                           th:class="${pessoa.entrou == 1 ? 'fw-bold text-success' : ''}">
                     </span>
                 </td>
+                <td class="text-center">
+                    <span th:text="${pessoa.igreja ?: '-'}"></span>
+                </td>
                 <td class="badge-cell">
                     <span class="badge" th:classappend="${pessoa.pagou == 1 ? 'bg-success' : 'bg-danger'}"
                           th:text="${pessoa.pagou == 1 ? 'Sim' : 'Não'}">
                     </span>
-                </td>
-                <td class="text-center">
-                    <span th:text="${pessoa.igreja ?: '-'}"></span>
                 </td>
                 <td class="badge-cell">
                     <span class="badge" th:classappend="${pessoa.entrou == 1 ? 'bg-success' : 'bg-warning'}"
