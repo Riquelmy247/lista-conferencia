@@ -43,10 +43,15 @@ public class PessoaController {
     }
 
     @PostMapping("/salvar")
-    public String salvar(@ModelAttribute Pessoa pessoa) {
+    public String salvar(@ModelAttribute Pessoa pessoa,
+                        @RequestParam(required = false) boolean isPagou) {
+        
+        pessoa.setPagou(isPagou ? 1 : 0);
+        
         if (pessoa.getId() == null) {
             pessoa.setEntrou(0);
         }
+        
         pessoaService.salvar(pessoa);
         return "redirect:/";
     }
