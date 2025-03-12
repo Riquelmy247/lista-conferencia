@@ -9,7 +9,7 @@ import java.util.List;
 public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
     @Query("SELECT p FROM Pessoa p WHERE " +
            "(COALESCE(:nome, '') = '' OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) AND " +
-           "(:igreja IS NULL OR p.igreja = :igreja) AND " +
+           "(COALESCE(:igreja, '') = '' OR p.igreja = :igreja) AND " +
            "(:pagou IS NULL OR p.pagou = :pagou) AND " +
            "(:entrou IS NULL OR p.entrou = :entrou) " +
            "ORDER BY p.nome ASC")
@@ -18,6 +18,6 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
                               @Param("pagou") Integer pagou,
                               @Param("entrou") Integer entrou);
 
-    @Query("SELECT DISTINCT p.igreja FROM Pessoa p WHERE p.igreja IS NOT NULL ORDER BY p.igreja")
+    @Query("SELECT DISTINCT p.igreja FROM Pessoa p WHERE p.igreja IS NOT NULL AND p.igreja <> '' ORDER BY p.igreja")
     List<String> findAllIgrejas();
 }
