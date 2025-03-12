@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/")
 public class PessoaController {
@@ -17,12 +19,17 @@ public class PessoaController {
     @GetMapping
     public String listar(Model model,
                         @RequestParam(required = false) String nome,
-                        @RequestParam(required = false) Integer patrocinador,
+                        @RequestParam(required = false) String igreja,
                         @RequestParam(required = false) Integer pagou,
                         @RequestParam(required = false) Integer entrou) {
-        model.addAttribute("pessoas", pessoaService.buscarPorFiltros(nome, patrocinador, pagou, entrou));
+        List<Pessoa> pessoas = pessoaService.buscarPorFiltros(nome, igreja, pagou, entrou);
+        List<String> igrejas = pessoaService.buscarTodasIgrejas();
+        
+        model.addAttribute("pessoas", pessoas);
+        model.addAttribute("igrejas", igrejas);
+        model.addAttribute("totalPessoas", pessoas.size());
         model.addAttribute("filtroNome", nome);
-        model.addAttribute("filtroPatrocinador", patrocinador);
+        model.addAttribute("filtroIgreja", igreja);
         model.addAttribute("filtroPagou", pagou);
         model.addAttribute("filtroEntrou", entrou);
         return "lista";
@@ -36,17 +43,10 @@ public class PessoaController {
     }
 
     @PostMapping("/salvar")
-    public String salvar(@ModelAttribute Pessoa pessoa, 
-                         @RequestParam(required = false, defaultValue = "false") boolean isPatrocinador,
-                         @RequestParam(required = false, defaultValue = "false") boolean isPagou) {
-        
-        pessoa.setPatrocinador(isPatrocinador ? 1 : 0);
-        pessoa.setPagou(isPagou ? 1 : 0);
-        
+    public String salvar(@ModelAttribute Pessoa pessoa) {
         if (pessoa.getId() == null) {
             pessoa.setEntrou(0);
         }
-        
         pessoaService.salvar(pessoa);
         return "redirect:/";
     }

@@ -18,8 +18,8 @@ public class PessoaService {
         return pessoaRepository.findAll();
     }
 
-    public List<Pessoa> buscarPorFiltros(String nome, Integer patrocinador, Integer pagou, Integer entrou) {
-        return pessoaRepository.findByFiltros(nome, patrocinador, pagou, entrou);
+    public List<Pessoa> buscarPorFiltros(String nome, String igreja, Integer pagou, Integer entrou) {
+        return pessoaRepository.findByFiltros(nome, igreja, pagou, entrou);
     }
 
     @Transactional
@@ -54,5 +54,9 @@ public class PessoaService {
     @Transactional
     public void deletar(Long id) {
         pessoaRepository.deleteById(id);
+    }
+
+    public List<String> buscarTodasIgrejas() {
+        return pessoaRepository.findAllIgrejas();
     }
 } 

@@ -38,7 +38,10 @@
 </head>
 <body>
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Lista de Mulheres Conferência</h2>
+    <div class="text-center mb-4">
+        <h2>Lista de Mulheres Conferência</h2>
+        <p class="text-muted" th:text="${totalPessoas} + ' pessoas listadas'"></p>
+    </div>
 
     <!-- Adicione após o título e antes do card de filtros -->
     <div class="text-end mb-3">
@@ -61,10 +64,13 @@
                         </select>
                     </div>
                     <div class="col-6 col-md-2">
-                        <select name="patrocinador" class="form-select">
-                            <option value="">Apoiador</option>
-                            <option value="1" th:selected="${filtroPatrocinador == 1}">Sim</option>
-                            <option value="0" th:selected="${filtroPatrocinador == 0}">Não</option>
+                        <select name="igreja" class="form-select">
+                            <option value="">Igreja</option>
+                            <option th:each="igreja : ${igrejas}"
+                                    th:value="${igreja}"
+                                    th:text="${igreja}"
+                                    th:selected="${igreja == filtroIgreja}">
+                            </option>
                         </select>
                     </div>
                     <div class="col-12 col-md-4">
@@ -92,7 +98,7 @@
             <tr>
                 <th>Nome</th>
                 <th class="text-center">Pago</th>
-                <th class="text-center">Apoiador</th>
+                <th class="text-center">Igreja</th>
                 <th class="text-center">Status</th>
             </tr>
             </thead>
@@ -113,10 +119,8 @@
                           th:text="${pessoa.pagou == 1 ? 'Sim' : 'Não'}">
                     </span>
                 </td>
-                <td class="badge-cell">
-                    <span class="badge" th:classappend="${pessoa.patrocinador == 1 ? 'bg-success' : 'bg-danger'}"
-                          th:text="${pessoa.patrocinador == 1 ? 'Sim' : 'Não'}">
-                    </span>
+                <td class="text-center">
+                    <span th:text="${pessoa.igreja ?: '-'}"></span>
                 </td>
                 <td class="badge-cell">
                     <span class="badge" th:classappend="${pessoa.entrou == 1 ? 'bg-success' : 'bg-warning'}"
@@ -215,7 +219,7 @@
 
     function limparFiltros() {
         document.querySelector('input[name="nome"]').value = '';
-        document.querySelector('select[name="patrocinador"]').value = '';
+        document.querySelector('select[name="igreja"]').value = '';
         document.querySelector('select[name="pagou"]').value = '';
         document.querySelector('select[name="entrou"]').value = '';
         document.getElementById('filterForm').submit();
